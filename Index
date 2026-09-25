@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Dashboard & Reporting Marketing — Labocast</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+  :root {
+    --bg: #f8fafc;
+    --card: #ffffff;
+    --border: #e2e8f0;
+    --text: #0f172a;
+    --muted: #64748b;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --border: #334155;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0f172a;
+    --card: #1e293b;
+    --border: #334155;
+    --text: #f8fafc;
+    --muted: #94a3b8;
+  }
+  html, body { background: var(--bg); color: var(--text); font-family: system-ui, -apple-system, sans-serif; }
+  .card { background: var(--card); border: 1px solid var(--border); }
+  input, select, textarea { background: var(--card); border: 1px solid var(--border); color: var(--text); }
+  input:focus, textarea:focus { outline: 2px solid #6366f1; border-color: transparent; }
+  .bar-bg { background: var(--border); }
+  .badge-good { background: #dcfce7; color: #15803d; }
+  .badge-mid { background: #fef3c7; color: #b45309; }
+  .badge-low { background: #fee2e2; color: #b91c1c; }
+  
+  @media print {
+    body { padding: 0; background: #fff; color: #000; }
+    header, #tab-saisie, #reportEmpty, .no-print { display: none !important; }
+    #tab-rapport { display: block !important; }
+    .card { box-shadow: none; border: 1px solid #cbd5e1; break-inside: avoid; }
+    textarea { border: none !important; resize: none; }
+  }
+</style>
+</head>
+<body class="p-4 md:p-8">
+<div class="max-w-6xl mx-auto space-y-6">
+
+  <!-- HEADER -->
+  <header class="card p-5 rounded-2xl shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+    <div class="flex items-center gap-3">
+      <div class="p-3 bg-indigo-600 text-white rounded-xl">
+        <i class="fa-solid fa-chart-pie text-xl"></i>
+      </div>
+      <div>
+        <h1 class="text-xl font-bold tracking-tight">Reporting Campagne Marketing</h1>
+        <p class="text-xs mt-0.5" style="color:var(--muted)">Meta Ads &amp; Organique · Google Analytics 4 · HubSpot</p>
+      </div>
+    </div>
+    <div class="flex flex-wrap gap-2 text-sm no-print">
+      <button onclick="showTab('saisie')" id="tab-btn-saisie" class="px-4 py-2 rounded-xl font-semibold bg-indigo-600 text-white transition-all">
+        <i class="fa-solid fa-pen-to-square mr-1.5"></i>Saisie
+      </button>
+      <button onclick="showTab('rapport')" id="tab-btn-rapport" class="px-4 py-2 rounded-xl font-semibold transition-all" style="border:1px solid var(--border)">
+        <i class="fa-solid fa-chart-line mr-1.5"></i>Rapport &amp; Analyse
+      </button>
+      <button onclick="window.print()" class="px-4 py-2 rounded-xl font-semibold hover:bg-slate-100 dark:hover:bg-slate-800 transition-all" style="border:1px solid var(--border)">
+        <i class="fa-solid fa-file-pdf mr-1.5"></i>Exporter PDF
+      </button>
+    </div>
+  </header>
+
+  <!-- TAB 1 : SAISIE -->
+  <div id="tab-saisie" class="space-y-5">
+
+    <!-- INFOS -->
+    <div class="card p-5 rounded-2xl shadow-sm space-y-3">
+      <h2 class="text-sm font-bold border-b pb-2 flex items-center gap-2" style="border-color:var(--border)">
+        <i class="fa-solid fa-tag text-indigo-600"></i> Informations Générales
+      </h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+        <div>
+          <label class="block text-xs font-semibold mb-1" style="color:var(--muted)">Nom de la campagne</label>
+          <input id="campaign_name" class="w-full p-2.5 rounded-xl text-sm" value="Campagnes FR(3D) - Webinar F.I.T - 6 October 2026">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold mb-1" style="color:var(--muted)">URL de la Landing Page</label>
+          <input id="landing_url" class="w-full p-2.5 rounded-xl text-sm" value="https://labocast3d.fr/portfolio/fit-wear-veneer-fr/">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold mb-1" style="color:var(--muted)">Date de début</label>
+          <input type="date" id="period_start" class="w-full p-2.5 rounded-xl text-sm" value="2026-09-12">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold mb-1" style="color:var(--muted)">Date de fin</label>
+          <input type="date" id="period_end" class="w-full p-2.5 rounded-xl text-sm" value="2026-09-24">
+        </div>
+      </div>
+    </div>
+
+    <!-- SOCIAL MEDIA -->
+    <div class="card p-5 rounded-2xl shadow-sm space-y-4">
+      <h2 class="text-sm font-bold border-b pb-2 flex items-center gap-2" style="border-color:var(--border)">
+        <i class="fa-solid fa-share-nodes text-blue-600"></i> 1. Social Media
+      </h2>
+      <div>
+        <h3 class="text-xs font-bold uppercase tracking-wider mb-2" style="color:var(--muted)">Social Ads Payant (Meta)</h3>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+          <div><label class="block mb-1 font-medium">Budget quotidien (€)</label><input id="paid_budget_daily" class="w-full p-2 rounded-lg" value="25"></div>
+          <div><label class="block mb-1 font-medium">Total Dépensé (€)</label><input id="paid_spent" class="w-full p-2 rounded-lg" value="97.90"></div>
+          <div><label class="block mb-1 font-medium">Impressions</label><input type="number" id="paid_impressions" class="w-full p-2 rounded-lg" value="10032"></div>
+          <div><label class="block mb-1 font-medium">Couverture (Uniques)</label><input type="number" id="paid_reach" class="w-full p-2 rounded-lg" value="5474"></div>
+        </div>
+      </div>
+      <div>
+        <h3 class="text-xs font-bold uppercase tracking-wider mb-2" style="color:var(--muted)">Organique — Impressions / Vues &amp; Interactions</h3>
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-3 text-xs" id="organicGrid"></div>
+      </div>
+    </div>
+
+    <!-- GA4 -->
+    <div class="card p-5 rounded-2xl shadow-sm space-y-4">
+      <h2 class="text-sm font-bold border-b pb-2 flex items-center gap-2" style="border-color:var(--border)">
+        <i class="fa-solid fa-chart-line text-emerald-600"></i> 2. Google Analytics 4
+      </h2>
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+        <div><label class="block mb-1 font-medium">Visiteurs uniques</label><input type="number" id="ga_users" class="w-full p-2 rounded-lg" value="223"></div>
+        <div><label class="block mb-1 font-medium">Pages vues</label><input type="number" id="ga_views" class="w-full p-2 rounded-lg" value="304"></div>
+        <div><label class="block mb-1 font-medium">Sessions</label><input type="number" id="ga_sessions" class="w-full p-2 rounded-lg" value="254"></div>
+        <div><label class="block mb-1 font-medium">Taux d'engagement (%)</label><input id="ga_engagement" class="w-full p-2 rounded-lg" value="34.25"></div>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
+        <div>
+          <h3 class="text-xs font-bold uppercase tracking-wider mb-2" style="color:var(--muted)">Sources de trafic (Sessions)</h3>
+          <div class="space-y-2 text-xs" id="sourcesGrid"></div>
+        </div>
+        <div>
+          <h3 class="text-xs font-bold uppercase tracking-wider mb-2" style="color:var(--muted)">Appareils (Sessions)</h3>
+          <div class="space-y-2 text-xs" id="devicesGrid"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- HUBSPOT -->
+    <div class="card p-5 rounded-2xl shadow-sm space-y-4">
+      <h2 class="text-sm font-bold border-b pb-2 flex items-center gap-2" style="border-color:var(--border)">
+        <i class="fa-solid fa-envelope text-amber-500"></i> 3. HubSpot — Newsletters &amp; Formulaire
+      </h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="nlGrid"></div>
+      <div class="pt-2">
+        <h3 class="text-xs font-bold uppercase tracking-wider mb-2" style="color:var(--muted)">Formulaire de Landing Page</h3>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+          <div><label class="block mb-1 font-medium">Vues du formulaire</label><input type="number" id="form_views" class="w-full p-2 rounded-lg" value="165"></div>
+          <div><label class="block mb-1 font-medium">Inscrits (Soumissions)</label><input type="number" id="form_submissions" class="w-full p-2 rounded-lg" value="124"></div>
+          <div><label class="block mb-1 font-medium">Contacts existants</label><input type="number" id="form_existing" class="w-full p-2 rounded-lg" value="113"></div>
+          <div><label class="block mb-1 font-medium">Nouveaux leads</label><input type="number" id="form_new" class="w-full p-2 rounded-lg" value="11"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BOUTONS D'ACTION -->
+    <div class="flex flex-wrap gap-3 pt-2">
+      <button onclick="generateReport()" class="flex-1 min-w-[220px] bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 px-6 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2">
+        <i class="fa-solid fa-wand-magic-sparkles"></i>Générer le Rapport
+      </button>
+      <button onclick="exportJSON()" class="bg-slate-800 hover:bg-slate-900 text-white font-semibold py-3.5 px-5 rounded-xl shadow transition-all flex items-center gap-2 text-sm">
+        <i class="fa-solid fa-download"></i>Exporter JSON
+      </button>
+      <label class="bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 font-semibold py-3.5 px-5 rounded-xl shadow cursor-pointer transition-all flex items-center gap-2 text-sm">
+        <i class="fa-solid fa-upload"></i>Importer JSON
+        <input type="file" accept=".json" onchange="importJSON(event)" class="hidden">
+      </label>
+    </div>
+  </div>
+
+  <!-- TAB 2 : RAPPORT -->
+  <div id="tab-rapport" class="space-y-6 hidden">
+    <div id="reportEmpty" class="card p-12 rounded-2xl shadow-sm text-center" style="color:var(--muted)">
+      <i class="fa-solid fa-chart-simple text-4xl mb-3 text-indigo-500"></i>
+      <p class="font-medium">Saisissez vos données puis cliquez sur « Générer le rapport ».</p>
+    </div>
+    <div id="reportContent" class="space-y-6 hidden"></div>
+  </div>
+
+</div>
+
+<script>
+const organicFields = [
+  {id:'fb', label:'Facebook — Post', icon:'fa-brands fa-facebook', color:'#1877f2', metric:'imp'},
+  {id:'insta_post', label:'Instagram — Post', icon:'fa-brands fa-instagram', color:'#e1306c', metric:'imp'},
+  {id:'insta_reel', label:'Instagram — Reel', icon:'fa-brands fa-instagram', color:'#e1306c', metric:'imp'},
+  {id:'linkedin', label:'LinkedIn — Post', icon:'fa-brands fa-linkedin', color:'#0a66c2', metric:'imp'},
+  {id:'yt_short', label:'YouTube — Short', icon:'fa-brands fa-youtube', color:'#ff0000', metric:'views'},
+  {id:'yt_video', label:'YouTube — Vidéo', icon:'fa-brands fa-youtube', color:'#ff0000', metric:'views'},
+];
+const organicDefaults = {fb:[94,1], insta_post:[305,6], insta_reel:[367,8], linkedin:[120,5], yt_short:[264,0], yt_video:[0,0]};
+const sourceFields = ['Paid social','Email','Organic social','Direct','Autre'];
+const sourceDefaults = [108,81,11,20,34];
+const deviceFields = ['Desktop','Mobile','Tablette'];
+const deviceDefaults = [168,45,10];
+
+function buildOrganicGrid(){
+  document.getElementById('organicGrid').innerHTML = organicFields.map(f => `
+    <div class="p-3 rounded-xl" style="background:var(--bg);border:1px solid var(--border)">
+      <p class="font-bold mb-2 flex items-center gap-1.5" style="color:${f.color}"><i class="${f.icon}"></i> ${f.label}</p>
+      <input type="number" id="${f.id}_imp" placeholder="${f.metric==='views'?'Vues':'Impressions'}" value="${organicDefaults[f.id][0]}" class="w-full p-2 text-xs rounded-lg mb-2">
+      ${f.metric==='imp' ? `<input type="number" id="${f.id}_inter" placeholder="Interactions" value="${organicDefaults[f.id][1]}" class="w-full p-2 text-xs rounded-lg">` : `<input type="text" id="${f.id}_inter" placeholder="Notes" value="" class="w-full p-2 text-xs rounded-lg">`}
+    </div>`).join('');
+}
+function buildBreakdownGrid(containerId, fields, defaults, prefix){
+  document.getElementById(containerId).innerHTML = fields.map((label,i) => `
+    <div class="flex items-center gap-2">
+      <span class="w-32 shrink-0 font-medium">${label}</span>
+      <input type="number" id="${prefix}_${i}" value="${defaults[i]}" class="p-2 rounded-lg flex-1 text-xs" placeholder="Sessions">
+    </div>`).join('');
+}
+function buildNLGrid(){
+  const defaults = [{sent:5029, delivered:5026, opens:1413, clicks:97}, {sent:4928, delivered:4924, opens:1059, clicks:23}];
+  document.getElementById('nlGrid').innerHTML = defaults.map((d,i) => `
+    <div class="p-4 rounded-xl" style="background:var(--bg);border:1px solid var(--border)">
+      <h3 class="font-bold text-sm mb-3">Newsletter ${i+1}</h3>
+      <div class="grid grid-cols-2 gap-2 text-xs">
+        <div><label class="block mb-1" style="color:var(--muted)">Envoyés</label><input type="number" id="nl${i+1}_sent" value="${d.sent}" class="w-full p-2 rounded-lg"></div>
+        <div><label class="block mb-1" style="color:var(--muted)">Délivrés</label><input type="number" id="nl${i+1}_delivered" value="${d.delivered}" class="w-full p-2 rounded-lg"></div>
+        <div><label class="block mb-1" style="color:var(--muted)">Ouvertures</label><input type="number" id="nl${i+1}_opens" value="${d.opens}" class="w-full p-2 rounded-lg"></div>
+        <div><label class="block mb-1" style="color:var(--muted)">Clics uniques</label><input type="number" id="nl${i+1}_clicks" value="${d.clicks}" class="w-full p-2 rounded-lg"></div>
+      </div>
+    </div>`).join('');
+}
+
+buildOrganicGrid();
+buildBreakdownGrid('sourcesGrid', sourceFields, sourceDefaults, 'src');
+buildBreakdownGrid('devicesGrid', deviceFields, deviceDefaults, 'dev');
+buildNLGrid();
+
+function showTab(t){
+  document.getElementById('tab-saisie').classList.toggle('hidden', t!=='saisie');
+  document.getElementById('tab-rapport').classList.toggle('hidden', t!=='rapport');
+  document.getElementById('tab-btn-saisie').className = 'px-4 py-2 rounded-xl font-semibold transition-all' + (t==='saisie' ? ' bg-indigo-600 text-white' : '');
+  document.getElementById('tab-btn-rapport').className = 'px-4 py-2 rounded-xl font-semibold transition-all' + (t==='rapport' ? ' bg-indigo-600 text-white' : '');
+}
+
+function val(id){ const el = document.getElementById(id); return el ? el.value : ''; }
+function num(id){ const v = parseFloat((val(id)+'').replace(',','.')); return isNaN(v) ? 0 : v; }
+function pct(n,total){ return total>0 ? (n/total*100) : 0; }
+function fmtPct(n){ return n.toFixed(2).replace('.',',') + ' %'; }
+function fmtNum(n){ return Number(n).toLocaleString('fr-FR'); }
+function fmtEUR(n){ return Number(n).toLocaleString('fr-FR',{minimumFractionDigits:2, maximumFractionDigits:2}) + ' €'; }
+function fmtDate(d){ if(!d) return ''; const [y,m,day]=d.split('-'); return `${day}/${m}/${y}`; }
+
+function collectData(){
+  const organic = organicFields.map(f => ({
+    label:f.label, icon:f.icon, color:f.color, metric:f.metric,
+    imp: num(f.id+'_imp'),
+    inter: f.metric==='imp' ? num(f.id+'_inter') : val(f.id+'_inter')
+  }));
+  const sources = sourceFields.map((l,i)=>({label:l, n:num('src_'+i)}));
+  const sourcesTotal = sources.reduce((a,s)=>a+s.n,0);
+  const devices = deviceFields.map((l,i)=>({label:l, n:num('dev_'+i)}));
+  const devicesTotal = devices.reduce((a,d)=>a+d.n,0);
+  const nl = [1,2].map(i => {
+    const sent=num('nl'+i+'_sent'), delivered=num('nl'+i+'_delivered'), opens=num('nl'+i+'_opens'), clicks=num('nl'+i+'_clicks');
+    return {
+      sent, 
+      delivered, 
+      opens, 
+      clicks, 
+      openRate: pct(opens,delivered), 
+      clickRate: pct(clicks,delivered), 
+      ctr: pct(clicks,opens)
+    };
+  });
+  const formViews = num('form_views'), formSub = num('form_submissions'), existing=num('form_existing'), newLeads=num('form_new');
+  return {
+    campaign_name: val('campaign_name'), landing_url: val('landing_url'),
+    period_start: val('period_start'), period_end: val('period_end'),
+    paid: { budget_daily:num('paid_budget_daily'), spent:num('paid_spent'), impressions:num('paid_impressions'), reach:num('paid_reach') },
+    organic, sources, sourcesTotal, devices, devicesTotal,
+    ga: { users:num('ga_users'), views:num('ga_views'), sessions:num('ga_sessions'), engagement:num('ga_engagement') },
+    nl,
+    form: { views:formViews, submissions:formSub, convRate: pct(formSub,formViews), existing, newLeads, existingPct: pct(existing,formSub), newPct: pct(newLeads,formSub) }
+  };
+}
+
+function fillFromData(d){
+  document.getElementById('campaign_name').value = d.campaign_name||'';
+  document.getElementById('landing_url').value = d.landing_url||'';
+  document.getElementById('period_start').value = d.period_start||'';
+  document.getElementById('period_end').value = d.period_end||'';
+  document.getElementById('paid_budget_daily').value = d.paid?.budget_daily??'';
+  document.getElementById('paid_spent').value = d.paid?.spent??'';
+  document.getElementById('paid_impressions').value = d.paid?.impressions??'';
+  document.getElementById('paid_reach').value = d.paid?.reach??'';
+  (d.organic||[]).forEach((o,i)=>{ const f=organicFields[i]; if(!f) return; document.getElementById(f.id+'_imp').value=o.imp; document.getElementById(f.id+'_inter').value=o.inter; });
+  (d.sources||[]).forEach((s,i)=> document.getElementById('src_'+i).value = s.n);
+  (d.devices||[]).forEach((v,i)=> document.getElementById('dev_'+i).value = v.n);
+  document.getElementById('ga_users').value = d.ga?.users??'';
+  document.getElementById('ga_views').value = d.ga?.views??'';
+  document.getElementById('ga_sessions').value = d.ga?.sessions??'';
+  document.getElementById('ga_engagement').value = d.ga?.engagement??'';
+  (d.nl||[]).forEach((n,i)=>{ const k=i+1; document.getElementById('nl'+k+'_sent').value=n.sent; document.getElementById('nl'+k+'_delivered').value=n.delivered; document.getElementById('nl'+k+'_opens').value=n.opens; document.getElementById('nl'+k+'_clicks').value=n.clicks; });
+  document.getElementById('form_views').value = d.form?.views??'';
+  document.getElementById('form_submissions').value = d.form?.submissions??'';
+  document.getElementById('form_existing').value = d.form?.existing??'';
+  document.getElementById('form_new').value = d.form?.newLeads??'';
+}
+
+function exportJSON(){
+  const data = collectData();
+  const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'campagne_' + (data.campaign_name||'export').replace(/[^a-z0-9]+/gi,'_').toLowerCase() + '.json';
+  a.click();
+}
+
+function importJSON(evt){
+  const file = evt.target.files[0]; if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e => { try{ fillFromData(JSON.parse(e.target.result)); generateReport(); }catch(err){ alert('Fichier JSON invalide.'); } };
+  reader.readAsText(file);
+}
+
+function badge(level, text){
+  const cls = level==='good' ? 'badge-good' : level==='mid' ? 'badge-mid' : 'badge-low';
+  return `<span class="inline-block px-2.5 py-0.5 rounded-full text-[11px] font-bold ${cls}">${text}</span>`;
+}
+
+function bar(pctVal){
+  return `<div class="w-full h-2 rounded-full bar-bg overflow-hidden mt-1"><div class="h-full bg-indigo-600 rounded-full" style="width:${Math.min(pctVal,100)}%"></div></div>`;
+}
+
+function buildDetailedAnalysis(d, cpl, bestOrganic){
+  const cplFormatted = d.form.submissions > 0 ? fmtEUR(cpl) : '—';
+  const bestOrganicText = bestOrganic && bestOrganic.imp > 0
+    ? `${bestOrganic.label} (${fmtPct(pct(bestOrganic.inter, bestOrganic.imp))})`
+    : 'Aucun canal dominant';
+  const newPct = d.form.newPct;
+  const convRate = d.form.convRate;
+
+  // --- Section 1 : funnel — verdict et lecture de la landing page conditionnés au taux réel ---
+  const funnelVerdict = convRate>=50 ? "un bilan opérationnel solide"
+    : convRate>=20 ? "un bilan correct, avec une marge de progression identifiable"
+    : "un bilan qui appelle une remise en question du parcours d'inscription";
+  const lowVolumeNote = (d.form.submissions>0 && d.form.submissions<20) ? " (le faible volume d'inscriptions invite à rester prudent sur ces conclusions)" : "";
+  const landingSentence = convRate>=50
+    ? `Ce niveau de performance indique une bonne adéquation entre la promesse (créatives/emails) et le contenu de la landing page — peu de déperdition entre la vue du formulaire et l'inscription.`
+    : convRate>=20
+    ? `Ce taux est correct sans être exceptionnel : une partie non négligeable des visiteurs qui voient le formulaire ne vont pas jusqu'à l'inscription.`
+    : `Ce taux est faible : la majorité des visiteurs qui voient le formulaire ne s'inscrivent pas. Cela pointe vers une déperdition importante à ce stade (nombre de champs, clarté de la promesse, preuve sociale) — à corroborer avec un volume de données plus large si la campagne est récente.`;
+
+  // --- Section 2 : social — CPM, meilleur canal organique et YouTube conditionnés aux vraies valeurs ---
+  const cpm = d.paid.impressions>0 ? (d.paid.spent/(d.paid.impressions/1000)) : 0;
+  const cpmSentence = d.paid.impressions===0 ? "Pas assez d'impressions pour évaluer le CPM."
+    : cpm<=10 ? `Le CPM est maîtrisé à ~${cpm.toFixed(2)} €, un niveau compétitif pour ce secteur.`
+    : cpm<=20 ? `Le CPM est dans la moyenne à ~${cpm.toFixed(2)} €.`
+    : `Le CPM ressort élevé à ~${cpm.toFixed(2)} €, à surveiller.`;
+  const freq = d.paid.reach>0 ? (d.paid.impressions/d.paid.reach) : 0;
+  const ytVideo = d.organic.find(o=>o.label==='YouTube — Vidéo');
+  const ytSentence = (ytVideo && ytVideo.metric==='views' && ytVideo.imp===0)
+    ? ` Les vidéos longues YouTube n'ont généré aucune vue sur cette période — format à retirer ou à repenser pour ce type d'événement court.`
+    : '';
+  const bestOrganicSentence = (bestOrganic && bestOrganic.imp>0)
+    ? `Canal le plus performant : ${bestOrganicText}.${bestOrganic.label.includes('LinkedIn') ? ` LinkedIn s'impose comme le canal naturel privilégié pour la cible B2B des chirurgiens-dentistes.` : ` Ce format devance les autres canaux organiques sur cette période — à creuser pour comprendre ce qui a mieux fonctionné (sujet, format, moment de publication).`}`
+    : `Aucun canal organique ne se distingue nettement sur cette période (volumes trop faibles pour conclure).`;
+
+  // --- Section 3 : GA4 — sources et appareil dominant lus dynamiquement, pas supposés ---
+  const topSources = [...d.sources].sort((a,b)=>b.n-a.n).slice(0,2);
+  const topDevice = d.devicesTotal>0 ? [...d.devices].sort((a,b)=>b.n-a.n)[0] : null;
+  const deviceSentence = !topDevice ? "Pas assez de sessions pour analyser la répartition par appareil."
+    : topDevice.label==='Desktop'
+    ? `Le trafic sur Desktop représente ${fmtPct(pct(topDevice.n,d.devicesTotal))} des sessions, cohérent avec une consultation B2B classique (poste de travail, horaires de bureau).`
+    : `Le trafic est majoritairement sur ${topDevice.label} (${fmtPct(pct(topDevice.n,d.devicesTotal))} des sessions), ce qui diffère du schéma B2B habituel dominé par le desktop — à vérifier que la landing page est bien optimisée pour cet usage.`;
+
+  // --- Section 4 : HubSpot — qualité des envois lue sur les vrais taux ---
+  const nlQuality = n => {
+    const openQ = n.openRate>=25 ? "un bon taux d'ouverture" : n.openRate>=15 ? "un taux d'ouverture correct" : "un taux d'ouverture faible";
+    const ctorQ = n.ctr>=5 ? "un très bon taux de clic parmi les ouvreurs" : n.ctr>=2 ? "un taux de clic correct parmi les ouvreurs" : "un taux de clic faible parmi les ouvreurs";
+    return `${openQ}, ${ctorQ}`;
+  };
+  const nl1 = d.nl[0] || {openRate:0,clickRate:0,ctr:0};
+  const nl2 = d.nl[1] || {openRate:0,clickRate:0,ctr:0};
+  const compositionSentence = d.form.submissions===0
+    ? "Pas assez d'inscriptions sur cette période pour analyser la composition de la base."
+    : newPct>=30
+    ? `La campagne a bien équilibré réactivation de la base existante et acquisition de nouveaux prospects.`
+    : `La campagne a surtout joué un rôle de réactivation de la base existante, avec un apport plus limité de nouveaux prospects.`;
+
+  const recBudget = newPct < 20
+    ? `1. Reventiler le Budget Meta Ads vers la Conquête
+Actuellement, la publicité réimpacte en grande partie une audience déjà connue (${fmtPct(newPct)} de nouveaux contacts seulement). Il est recommandé de scinder la structure de campagne Meta Ads en deux ensembles d'annonces :
+- 30 % du budget sur du Retargeting / Audience engagée.
+- 70 % sur une audience Lookalike (Audience similaire basée sur les clients existants) et ciblage par centres d'intérêt ciblés (Prothèse, Implantologie, Odontologie) pour forcer la captation de nouveaux profils.`
+    : `1. Consolider l'Équilibre Réactivation / Conquête
+Avec ${fmtPct(newPct)} de nouveaux contacts parmi les inscrits, l'équilibre entre réactivation de la base existante et acquisition de nouveaux profils est déjà satisfaisant. Maintenir le mix actuel de ciblage plutôt que de le restructurer en profondeur.`;
+
+  const recOrganic = `2. Ajuster la Stratégie de Contenu Social Organique
+- Prioriser ${(bestOrganic && bestOrganic.imp>0) ? bestOrganic.label : 'le format organique le plus engageant une fois plus de données disponibles'} : c'est le format qui démontre le meilleur taux d'engagement sur cette période — à reproduire.${(ytVideo && ytVideo.imp===0) ? `\n- Revoir la chaîne de distribution Vidéo : les vidéos longues YouTube n'ont généré aucune vue pour ce type d'événement court — les stopper ou les remplacer par des Shorts/Reels verticaux dynamiques.` : ''}`;
+
+  const recLanding = convRate >= 50
+    ? `3. Exploiter l'Excellente Conversion de la Landing Page
+Le taux de conversion à ${fmtPct(convRate)} indique que la page de destination n'a pas besoin d'optimisation UX/UI à court terme. Toute l'énergie marketing doit être concentrée sur l'injection de trafic frais qualifié en entrée de funnel.`
+    : `3. Travailler la Conversion de la Landing Page
+Le taux de conversion à ${fmtPct(convRate)} laisse de la marge de progression. Avant d'investir davantage en acquisition de trafic, il est recommandé de tester le formulaire (nombre de champs, clarté de la promesse, preuve sociale) pour réduire la déperdition entre visite et inscription.`;
+
+  return `1. PERFORMANCE GLOBALE & ÉCONOMIE DU FUNNEL
+La campagne enregistre ${funnelVerdict}${lowVolumeNote}.
+• Volume & Ratios : Pour un budget publicitaire engagé de ${fmtEUR(d.paid.spent)}, la campagne génère ${fmtNum(d.form.submissions)} inscription${d.form.submissions>1?'s':''}, soit un Coût Par Lead (CPL) de ${cplFormatted}.
+• Efficacité de la Landing Page : Avec ${fmtNum(d.form.views)} vues du formulaire pour ${fmtNum(d.form.submissions)} soumissions, le taux de conversion de la page atteint ${fmtPct(convRate)}. ${landingSentence}
+
+2. ACQUISITION SOCIAL MEDIA (PAID & ORGANIC)
+• Meta Ads : L'activation payante reste à un niveau de test/maintien (${fmtEUR(d.paid.budget_daily)}/jour pour ${fmtEUR(d.paid.spent)} consommés). ${cpmSentence} (${fmtNum(d.paid.impressions)} impressions pour ${fmtNum(d.paid.reach)} personnes touchées, ~${freq.toFixed(2)} affichage/utilisateur).
+• Engagement Organique : ${bestOrganicSentence}${ytSentence}
+
+3. COMPORTEMENT D'AUDIENCE & TRAFIC (GA4)
+• Mix de Trafic : Les deux premiers leviers en sessions sont ${topSources[0]?.label||'—'} (${fmtNum(topSources[0]?.n||0)}) et ${topSources[1]?.label||'—'} (${fmtNum(topSources[1]?.n||0)}), sur un total de ${fmtNum(d.sourcesTotal)} sessions.
+• Usage Équipement : ${deviceSentence}
+
+4. DYNAMIQUE EMAIL & RÉTENTION HUBSPOT
+• Performance des Envois :
+  - Emailing 1 (Invitation) : ${fmtPct(nl1.openRate)} d'ouverture, Click Rate de ${fmtPct(nl1.clickRate)} (clics/délivrés) et CTOR de ${fmtPct(nl1.ctr)} (clics/ouvertures) — ${nlQuality(nl1)}.
+  - Emailing 2 (Relance) : ${fmtPct(nl2.openRate)} d'ouverture, Click Rate de ${fmtPct(nl2.clickRate)} et CTOR de ${fmtPct(nl2.ctr)} — ${nlQuality(nl2)}. Une baisse par rapport au premier envoi est normale pour une relance : les destinataires les plus réceptifs ont déjà ouvert ou cliqué au premier envoi.
+• Composition de la Base Inscrite : Sur les ${fmtNum(d.form.submissions)} inscrits, ${fmtNum(d.form.existing)} (${fmtPct(d.form.existingPct)}) étaient déjà répertoriés dans le CRM HubSpot, contre ${fmtNum(d.form.newLeads)} nouveaux contacts (${fmtPct(newPct)}). ${compositionSentence}
+
+---
+
+PLAN D'ACTION & RECOMMANDATIONS STRATÉGIQUES
+
+${recBudget}
+
+${recOrganic}
+
+${recLanding}`;
+}
+
+function generateReport(){
+  const d = collectData();
+  try{ localStorage.setItem('reporting_campagne_data', JSON.stringify(d)); }catch(e){}
+  const bestOrganic = [...d.organic].filter(o=>o.metric==='imp').sort((a,b)=> pct(b.inter,b.imp) - pct(a.inter,a.imp))[0];
+  const cpl = d.form.submissions>0 ? d.paid.spent/d.form.submissions : 0;
+
+  const convBadge = d.form.convRate>=50 ? 'good' : d.form.convRate>=20 ? 'mid' : 'low';
+  const newLeadBadge = d.form.newPct>=30 ? 'good' : d.form.newPct>=10 ? 'mid' : 'low';
+  const engBadge = d.ga.engagement>=30 ? 'good' : d.ga.engagement>=15 ? 'mid' : 'low';
+
+  const summaryBullets = [
+    `<strong>${fmtNum(d.form.submissions)} inscriptions</strong> obtenues pour ${fmtEUR(d.paid.spent)} de coût publicitaire (${d.form.submissions>0?fmtEUR(cpl):'—'} / inscrit).`,
+    `Taux de conversion du formulaire : <strong>${fmtPct(d.form.convRate)}</strong> (${d.form.convRate>=50?'Très bon':d.form.convRate>=20?'Satisfaisant':'À optimiser'}).`,
+    `Génération de prospects : <strong>${fmtPct(d.form.newPct)}</strong> de nouveaux leads (${fmtNum(d.form.newLeads)}) contre ${fmtPct(d.form.existingPct)} de contacts réactivés.`,
+    bestOrganic ? `Canal organique le plus engagé : <strong>${bestOrganic.label}</strong> (${fmtPct(pct(bestOrganic.inter,bestOrganic.imp))}).` : ''
+  ].map(b=>`<li class="flex items-start gap-2 text-sm"><i class="fa-solid fa-circle-check text-indigo-600 mt-0.5"></i><span>${b}</span></li>`).join('');
+
+  const detailedAnalysisText = buildDetailedAnalysis(d, cpl, bestOrganic);
+
+  const html = `
+    <div class="card p-6 rounded-2xl shadow-sm flex flex-col md:flex-row justify-between md:items-center gap-3">
+      <div>
+        <span class="inline-block px-3 py-1 bg-indigo-100 text-indigo-700 text-xs font-bold rounded-full uppercase tracking-wider mb-2">Synthèse de Campagne</span>
+        <h2 class="text-xl font-extrabold tracking-tight">${d.campaign_name || 'Campagne'}</h2>
+        <p class="text-xs mt-1" style="color:var(--muted)"><i class="fa-regular fa-calendar mr-1.5"></i>Du ${fmtDate(d.period_start)} au ${fmtDate(d.period_end)}</p>
+      </div>
+      ${d.landing_url ? `<a href="${d.landing_url}" target="_blank" class="text-xs font-medium text-indigo-600 hover:underline break-all bg-indigo-50 dark:bg-indigo-950/40 p-2.5 rounded-xl border border-indigo-100 dark:border-indigo-900"><i class="fa-solid fa-arrow-up-right-from-square mr-1"></i>${d.landing_url}</a>` : ''}
+    </div>
+
+    <!-- ESSENTIEL -->
+    <div class="card p-6 rounded-2xl shadow-sm border-l-4 border-l-indigo-600">
+      <h3 class="text-sm font-bold mb-3 flex items-center gap-2"><i class="fa-solid fa-star text-amber-500"></i>L'essentiel en un coup d'œil</h3>
+      <ul class="space-y-2.5">${summaryBullets}</ul>
+    </div>
+
+    <!-- CARDS METRIQUES -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="card p-5 rounded-2xl shadow-sm">
+        <p class="text-xs uppercase font-semibold" style="color:var(--muted)">Inscriptions Total</p>
+        <p class="text-3xl font-black text-indigo-600 my-1">${fmtNum(d.form.submissions)}</p>
+        <div>${badge(convBadge,'Conv. '+fmtPct(d.form.convRate))}</div>
+      </div>
+      <div class="card p-5 rounded-2xl shadow-sm">
+        <p class="text-xs uppercase font-semibold" style="color:var(--muted)">Nouveaux Leads</p>
+        <p class="text-3xl font-black text-emerald-600 my-1">${fmtNum(d.form.newLeads)}</p>
+        <div>${badge(newLeadBadge, fmtPct(d.form.newPct)+' du total')}</div>
+      </div>
+      <div class="card p-5 rounded-2xl shadow-sm">
+        <p class="text-xs uppercase font-semibold" style="color:var(--muted)">Visiteurs Uniques</p>
+        <p class="text-3xl font-black my-1">${fmtNum(d.ga.users)}</p>
+        <div>${badge(engBadge,'Engagement '+fmtPct(d.ga.engagement))}</div>
+      </div>
+      <div class="card p-5 rounded-2xl shadow-sm">
+        <p class="text-xs uppercase font-semibold" style="color:var(--muted)">Coût / Inscrit</p>
+        <p class="text-3xl font-black my-1">${d.form.submissions>0 ? fmtEUR(cpl) : '—'}</p>
+        <p class="text-xs font-medium" style="color:var(--muted)">${fmtEUR(d.paid.spent)} dépensés</p>
+      </div>
+    </div>
+
+    <!-- SECTIONS DETAIL -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+      <!-- SOCIAL -->
+      <section class="card p-5 rounded-2xl shadow-sm space-y-4">
+        <h3 class="font-bold text-sm border-b pb-2 flex items-center gap-2" style="border-color:var(--border)"><i class="fa-solid fa-share-nodes text-blue-600"></i>Social Media</h3>
+        <p class="text-[10px] -mt-2.5" style="color:var(--muted)">Le % affiché sur l'organique = taux d'engagement (interactions ÷ impressions)</p>
+        <div class="p-3.5 rounded-xl" style="background:var(--bg);border:1px solid var(--border)">
+          <h4 class="text-xs font-bold uppercase mb-2" style="color:var(--muted)">Ads (Meta)</h4>
+          <div class="grid grid-cols-2 gap-2 text-xs">
+            <p>Budget : <strong>${fmtEUR(d.paid.spent)}</strong></p>
+            <p>Couverture : <strong>${fmtNum(d.paid.reach)}</strong></p>
+            <p class="col-span-2">Impressions : <strong class="text-indigo-600">${fmtNum(d.paid.impressions)}</strong></p>
+          </div>
+        </div>
+        <div>
+          <h4 class="text-xs font-bold uppercase mb-2" style="color:var(--muted)">Organique</h4>
+          <ul class="space-y-2 text-xs">
+            ${d.organic.map(o => `
+              <li class="flex justify-between items-center p-2 rounded-lg" style="background:var(--bg)">
+                <span><i class="${o.icon} mr-1.5" style="color:${o.color}"></i>${o.label}</span>
+                <span class="font-bold">${o.metric==='views' ? fmtNum(o.imp)+' vues' : fmtNum(o.imp)+' impr. · '+fmtPct(pct(o.inter,o.imp))}</span>
+              </li>`).join('')}
+          </ul>
+        </div>
+      </section>
+
+      <!-- GA4 -->
+      <section class="card p-5 rounded-2xl shadow-sm space-y-4">
+        <h3 class="font-bold text-sm border-b pb-2 flex items-center gap-2" style="border-color:var(--border)"><i class="fa-solid fa-chart-line text-emerald-600"></i>Google Analytics 4</h3>
+        <p class="text-[10px] -mt-2.5" style="color:var(--muted)">Engagement = part des sessions avec une interaction significative (>10s, conversion, 2+ pages)</p>
+        <div class="grid grid-cols-2 gap-2 text-xs">
+          <div class="p-3 rounded-xl" style="background:var(--bg);border:1px solid var(--border)"><p style="color:var(--muted)">Sessions</p><p class="text-xl font-black">${fmtNum(d.ga.sessions)}</p></div>
+          <div class="p-3 rounded-xl" style="background:var(--bg);border:1px solid var(--border)"><p style="color:var(--muted)">Engagement</p><p class="text-xl font-black text-emerald-600">${fmtPct(d.ga.engagement)}</p></div>
+        </div>
+        <div>
+          <h4 class="text-xs font-bold uppercase mb-2" style="color:var(--muted)">Sources de Trafic</h4>
+          ${d.sources.map(s => `<div class="text-xs mb-2"><div class="flex justify-between font-medium"><span>${s.label}</span><span>${fmtPct(pct(s.n,d.sourcesTotal))}</span></div>${bar(pct(s.n,d.sourcesTotal))}</div>`).join('')}
+        </div>
+      </section>
+
+      <!-- HUBSPOT -->
+      <section class="card p-5 rounded-2xl shadow-sm space-y-4">
+        <h3 class="font-bold text-sm border-b pb-2 flex items-center gap-2" style="border-color:var(--border)"><i class="fa-solid fa-envelope text-amber-500"></i>HubSpot</h3>
+        <div>
+          <h4 class="text-xs font-bold uppercase mb-2" style="color:var(--muted)">Emailings</h4>
+          <p class="text-[10px] -mt-1.5 mb-1.5" style="color:var(--muted)">Click Rate = clics ÷ délivrés · CTR = clics ÷ ouvertures (taux de clic parmi ceux qui ont ouvert)</p>
+          <div class="overflow-x-auto">
+            <table class="w-full text-xs">
+              <thead>
+                <tr style="color:var(--muted)">
+                  <th class="text-left font-semibold pb-1.5">Email</th>
+                  <th class="text-right font-semibold pb-1.5">Ouverture</th>
+                  <th class="text-right font-semibold pb-1.5">Click Rate</th>
+                  <th class="text-right font-semibold pb-1.5">CTR</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${d.nl.map((n,i)=>`
+                  <tr class="border-t" style="border-color:var(--border)">
+                    <td class="py-2 font-medium">Emailing ${i+1}</td>
+                    <td class="text-right font-bold">${fmtPct(n.openRate)}</td>
+                    <td class="text-right font-bold">${fmtPct(n.clickRate)}</td>
+                    <td class="text-right font-bold text-indigo-600">${fmtPct(n.ctr)}</td>
+                  </tr>`).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div>
+          <h4 class="text-xs font-bold uppercase mb-2" style="color:var(--muted)">Répartition Inscrits</h4>
+          <div class="text-xs mb-2"><div class="flex justify-between font-medium"><span>Contacts existants</span><span>${fmtPct(d.form.existingPct)} (${fmtNum(d.form.existing)})</span></div>${bar(d.form.existingPct)}</div>
+          <div class="text-xs"><div class="flex justify-between font-medium"><span>Nouveaux leads</span><span>${fmtPct(d.form.newPct)} (${fmtNum(d.form.newLeads)})</span></div>${bar(d.form.newPct)}</div>
+        </div>
+      </section>
+    </div>
+
+    <!-- ZONE D'ANALYSE IA -->
+    <footer class="card p-6 rounded-2xl shadow-sm space-y-3">
+      <h3 class="text-sm font-bold flex items-center gap-2"><i class="fa-solid fa-brain text-indigo-600"></i>Analyse Stratégique &amp; Recommandations</h3>
+      <textarea id="analysisText" rows="18" class="w-full p-4 text-xs md:text-sm rounded-xl leading-relaxed font-mono" placeholder="L'analyse détaillée s'affiche automatiquement ici..."></textarea>
+    </footer>
+  `;
+
+  document.getElementById('reportContent').innerHTML = html;
+  document.getElementById('reportContent').classList.remove('hidden');
+  document.getElementById('reportEmpty').classList.add('hidden');
+  showTab('rapport');
+  
+  document.getElementById('analysisText').value = detailedAnalysisText;
+}
+</script>
+</body>
+</html>
